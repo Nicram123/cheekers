@@ -1,5 +1,5 @@
 import pygame 
-from .constatnts import RED, WHITE, SQUARE_SIZE, GREY, BLUE, ROWS, COLS, BLACK , CROWN
+from constatnts import RED, WHITE, SQUARE_SIZE, GREY, BLUE, ROWS, COLS, BLACK , CROWN
 import math as m
 
 class Piece:
@@ -10,7 +10,10 @@ class Piece:
     self.row = row
     self.col = col
     self.color = color
-    self.king = False
+    self.king = False 
+    
+    
+     
     if self.color == RED:
       self.direction = -1
     else:
@@ -30,8 +33,7 @@ class Piece:
     for x in range(len(board.boardOfBlue)):
       if ( board.boardOfBlue[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.boardOfBlue[x].row * SQUARE_SIZE + SQUARE_SIZE and
       board.boardOfBlue[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.boardOfBlue[x].col * SQUARE_SIZE + SQUARE_SIZE ):
-        return True
-      
+        return True 
     return False
   
   def upgrate(self,board,win,ix):
@@ -44,22 +46,21 @@ class Piece:
       board.board[self.row][self.col] = vi
       self.drawBlackSquare(win,board)
       board.boardOfBlue.clear()
-      
-      
       self.calc_pos()
       self.draw(win)
 
   def move(self,board,win,mouse_position):
-
     for x in range(len(board.boardOfBlue)):
       if ( board.boardOfBlue[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.boardOfBlue[x].row * SQUARE_SIZE + SQUARE_SIZE and
       board.boardOfBlue[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.boardOfBlue[x].col * SQUARE_SIZE + SQUARE_SIZE ):
         self.upgrate(board,win,x)
         self.remove(mouse_position[1],mouse_position[0],win,board)
         self.ifKing()
-        self.setPicture(win)
+        self.setPicture(win, board)
         break
-
+      
+    
+  
   def calc_pos(self):
     self.x = SQUARE_SIZE * self.col + SQUARE_SIZE // 2
     self.y = SQUARE_SIZE * self.row + SQUARE_SIZE // 2
@@ -125,6 +126,12 @@ class Piece:
     for x in range(len(piece_list)):
         pygame.draw.rect(win, BLACK, (piece_list[x].col * SQUARE_SIZE, piece_list[x].row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
         board.board[piece_list[x].row][piece_list[x].col] = 0
+                
+        if piece_list[x].color == RED:
+            board.red_left -= 1
+        else:
+            board.white_left -= 1
+            
         if not self.ClumpingLimit(finalX, finalY, piece_list[x]):
             continue
         else:
@@ -198,10 +205,48 @@ class Piece:
       if self.row == ROWS - 1:
         self.king = True
         
+  # elo   
+  def setPicture(self,win, board):
+    if self.king == True and self not in board.king_piece: 
+      board.king_piece.append(self) 
+      if self.color == RED: 
+        board.red_kings += 1
+      else:
+        board.white_kings += 1
+    for piece in board.king_piece:
+        win.blit(CROWN, (piece.x - CROWN.get_width()//2, piece.y - CROWN.get_height()//2))
+   
         
-  def setPicture(self,win):
-    if self.king == True:
-      win.blit(CROWN, (self.x - CROWN.get_width()//2, self.y - CROWN.get_height()//2))
+  def get_valid_moves(self, board):
+    moves = {}
+    directions = [(1, -1), (-1, -1), (1, 1), (-1, 1)] if self.king else [(-1, -1), (-1, 1)] if self.color == RED else [(1, -1), (1, 1)]
+
+    def traverse(row, col, captured):
+        found_capture = False
+        for dr, dc in directions:
+            r1, c1 = row + dr, col + dc
+            r2, c2 = row + 2 * dr, col + 2 * dc
+            # Sprawdzenie granic dla r1, c1 i r2, c2
+            if (0 <= r1 < len(board.board) and 0 <= c1 < len(board.board[0]) and
+                0 <= r2 < len(board.board) and 0 <= c2 < len(board.board[0])):
+                if (board.board[r1][c1] != 0 and self.color != board.board[r1][c1].color and
+                    board.board[r2][c2] == 0 and board.board[r1][c1] not in captured):
+                    found_capture = True
+                    new_captured = captured + [board.board[r1][c1]]
+                    moves[(r2, c2)] = new_captured
+                    traverse(r2, c2, new_captured)
+        if not found_capture and not captured:
+            for dr, dc in directions:
+                r, c = row + dr, col + dc
+                if 0 <= r < len(board.board) and 0 <= c < len(board.board[0]) and board.board[r][c] == 0:
+                    moves[(r, c)] = []
+
+    traverse(self.row, self.col, [])
+    return moves
+  
+  
+        
+        
 
 
 
