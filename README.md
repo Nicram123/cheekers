@@ -27,8 +27,7 @@ Projekt implementujący grę **Warcaby (Checkers)** w Pythonie z interfejsem gra
 ---
 
 ## 🖼️ Screenshot  
-
-*(możesz tu wrzucić zrzut ekranu np. `screenshot.png`)*  
+![Checkers AI Gameplay](assets/checkers.gif)  
 
 ---
 
