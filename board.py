@@ -1,6 +1,6 @@
 import pygame
 
-from constatnts import BLACK, ROWS, COLS, RED, SQUARE_SIZE, WHITE
+from constatnts import BLACK, ROWS, COLS, RED, SQUARE_SIZE, WHITE, GREEN
 from piece import Piece
 import math as m
 
@@ -63,7 +63,7 @@ class Board:
     win.fill(BLACK)
     for row in range(ROWS):
         for col in range(row % 2, ROWS, 2):
-           pygame.draw.rect(win,RED,(row*SQUARE_SIZE,col*SQUARE_SIZE,SQUARE_SIZE,SQUARE_SIZE))
+           pygame.draw.rect(win,GREEN,(row*SQUARE_SIZE,col*SQUARE_SIZE,SQUARE_SIZE,SQUARE_SIZE))
 
   def get_board(self):
     return self.board

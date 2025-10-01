@@ -1,9 +1,9 @@
 import pygame 
-from constatnts import RED, WHITE, SQUARE_SIZE, GREY, BLUE, ROWS, COLS, BLACK , CROWN
+from constatnts import RED, WHITE, SQUARE_SIZE, GREY, GOLDEN, ROWS, COLS, BLACK , CROWN
 import math as m
 
 class Piece:
-  PADDING = 10
+  PADDING = 8
   OUTLINE = 2
   captured_pieces = []
   def __init__(self,row,col,color):
@@ -155,7 +155,7 @@ class Piece:
 
   def drawBlueCircle(self, win):
     radius = SQUARE_SIZE//2 - self.PADDING * 4
-    pygame.draw.circle(win, BLUE, (self.x,self.y), radius)
+    pygame.draw.circle(win, GOLDEN, (self.x,self.y), radius)
     
   
   def drawBlackSquare(self,win,board):

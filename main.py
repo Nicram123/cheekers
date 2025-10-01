@@ -1,12 +1,12 @@
 import pygame
-from constatnts import WIDTH, HEIGHT, SQUARE_SIZE, WHITE, RED, BLACK
+from constatnts import WIDTH, HEIGHT, SQUARE_SIZE, WHITE, RED, BLACK, GREEN 
 from board import Board 
 from piece import Piece 
 from minimax import minimax
 
 FPS = 60
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption('Checkers')
+pygame.display.set_caption('checkers game AI')
 
 
 def main():
@@ -19,9 +19,6 @@ def main():
 
   while run:
     clock.tick(FPS)
-    
-    
-
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         run = False
@@ -42,23 +39,15 @@ def main():
               obj.check_capture_recursive(board,WIN)
           elif not first_left_click and obj is not isinstance(obj, int):
             obj.move(board,WIN,mouse_position)
-            #board.draw(WIN)  # odśwież planszę po ruchu gracza
             first_left_click = True
-            # Po ruchu gracza (czerwonych), zmieniamy turę na białe
             board.change_turn()
             if board.turn == WHITE:
                 value, new_board, piece_ = minimax(board, 3, True, WIN, WIN)
                 board = new_board
-                
                 board.draw(WIN, piece_)  # <--- to zamiast manualnego recta
-                #piece_.setPicture(WIN, board)
-                #board.display_all_pieces(WHITE, WIN) 
-                #pygame.draw.rect(WIN, BLACK, (piece_.col * SQUARE_SIZE, piece_.row * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE))
+                
                 board.change_turn()
                 print("AI made a move")
-
-            # AI (białe) wykonuje ruch tylko jeśli jest ich tura
-   
     pygame.display.update()
 
   pygame.quit()
