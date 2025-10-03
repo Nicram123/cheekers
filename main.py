@@ -2,7 +2,7 @@ import pygame
 from constatnts import WIDTH, HEIGHT, SQUARE_SIZE, WHITE, RED, BLACK, GREEN 
 from board import Board 
 from piece import Piece 
-from minimax import MinimaxAlgorithm
+from minimax import mini_max
 
 FPS = 60
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -13,7 +13,7 @@ def main():
   run = True
   clock = pygame.time.Clock()
   board = Board()
-  minimax = MinimaxAlgorithm()
+  #minimax = MinimaxAlgorithm()
   board.draw(WIN)
   first_left_click = True
   obj = 0
@@ -25,9 +25,9 @@ def main():
         run = False
       if event.type == pygame.MOUSEBUTTONDOWN:
         mouse_position = pygame.mouse.get_pos()
-        if obj == 0 or len(board.boardOfBlue) == 0 or ( obj is not isinstance(obj, int) and not obj.returnTrue(board,mouse_position)) :
+        if obj == 0 or len(board.possible_places_to_move) == 0 or ( obj is not isinstance(obj, int) and not obj.returnTrue(board,mouse_position)) :
           obj = board.choose_a_pown(mouse_position)
-        elif len(board.boardOfBlue) == 0:
+        elif len(board.possible_places_to_move) == 0:
           first_left_click = True
         else:
           first_left_click = False
@@ -43,7 +43,8 @@ def main():
             first_left_click = True
             board.change_turn()
             if board.turn == WHITE:
-                value, new_board, piece_ = minimax.mini_max(3, board, True)
+                board.refresh_counts()  # <--- odswiezanie liczby pionkow po ruchu AI
+                value, new_board, piece_ = mini_max(3, board, True)
                 board = new_board
                 board.draw(WIN, piece_)  # <--- to zamiast manualnego recta   
                 board.change_turn()

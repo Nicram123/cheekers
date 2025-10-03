@@ -30,9 +30,9 @@ class Piece:
       return False
     
   def returnTrue(self,board,mouse_position):
-    for x in range(len(board.boardOfBlue)):
-      if ( board.boardOfBlue[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.boardOfBlue[x].row * SQUARE_SIZE + SQUARE_SIZE and
-      board.boardOfBlue[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.boardOfBlue[x].col * SQUARE_SIZE + SQUARE_SIZE ):
+    for x in range(len(board.possible_places_to_move)):
+      if ( board.possible_places_to_move[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.possible_places_to_move[x].row * SQUARE_SIZE + SQUARE_SIZE and
+      board.possible_places_to_move[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.possible_places_to_move[x].col * SQUARE_SIZE + SQUARE_SIZE ):
         return True 
     return False
   
@@ -40,19 +40,19 @@ class Piece:
       pygame.draw.rect(win,BLACK,(self.col*SQUARE_SIZE,self.row*SQUARE_SIZE,SQUARE_SIZE,SQUARE_SIZE))
       vi = board.board[self.row][self.col]
       board.board[self.row][self.col] = 0  
-      self.row = board.boardOfBlue[ix].row 
-      self.col = board.boardOfBlue[ix].col
+      self.row = board.possible_places_to_move[ix].row 
+      self.col = board.possible_places_to_move[ix].col
       self.center = (self.row*SQUARE_SIZE + SQUARE_SIZE//2,self.col * SQUARE_SIZE + SQUARE_SIZE//2)
       board.board[self.row][self.col] = vi
       self.drawBlackSquare(win,board)
-      board.boardOfBlue.clear()
+      board.possible_places_to_move.clear()
       self.calc_pos()
       self.draw(win)
 
   def move(self,board,win,mouse_position):
-    for x in range(len(board.boardOfBlue)):
-      if ( board.boardOfBlue[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.boardOfBlue[x].row * SQUARE_SIZE + SQUARE_SIZE and
-      board.boardOfBlue[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.boardOfBlue[x].col * SQUARE_SIZE + SQUARE_SIZE ):
+    for x in range(len(board.possible_places_to_move)):
+      if ( board.possible_places_to_move[x].row * SQUARE_SIZE <= mouse_position[1] <=  board.possible_places_to_move[x].row * SQUARE_SIZE + SQUARE_SIZE and
+      board.possible_places_to_move[x].col * SQUARE_SIZE <= mouse_position[0] <=  board.possible_places_to_move[x].col * SQUARE_SIZE + SQUARE_SIZE ):
         self.upgrate(board,win,x)
         self.remove(mouse_position[1],mouse_position[0],win,board)
         self.ifKing()
@@ -95,7 +95,7 @@ class Piece:
                         break
                 obj = Piece(r, c, self.color)
                 obj.row, obj.col = r, c
-                board.boardOfBlue.append(obj)
+                board.possible_places_to_move.append(obj)
                 obj.calc_pos()
                 obj.drawBlueCircle(win)
                 if max_depth > 0:
@@ -128,9 +128,9 @@ class Piece:
         board.board[piece_list[x].row][piece_list[x].col] = 0
                 
         if piece_list[x].color == RED:
-            board.red_left -= 1
+            board.red_count -= 1
         else:
-            board.white_left -= 1
+            board.white_count -= 1
             
         if not self.ClumpingLimit(finalX, finalY, piece_list[x]):
             continue
@@ -159,12 +159,12 @@ class Piece:
     
   
   def drawBlackSquare(self,win,board):
-    for x in range(len(board.boardOfBlue)):
-      pygame.draw.rect(win,BLACK,(board.boardOfBlue[x].col*SQUARE_SIZE,board.boardOfBlue[x].row*SQUARE_SIZE,SQUARE_SIZE,SQUARE_SIZE))
+    for x in range(len(board.possible_places_to_move)):
+      pygame.draw.rect(win,BLACK,(board.possible_places_to_move[x].col*SQUARE_SIZE,board.possible_places_to_move[x].row*SQUARE_SIZE,SQUARE_SIZE,SQUARE_SIZE))
   
   def BlueField(self, win, board):
     self.drawBlackSquare(win, board)
-    board.boardOfBlue.clear()
+    board.possible_places_to_move.clear()
     
     newX1 = self.col - 1
     newX2 = self.col + 1
@@ -176,7 +176,7 @@ class Piece:
         for newX, newY in [(newX1, newY2), (newX2, newY2), (newX1, newY1), (newX2, newY1)]:
             if 0 <= newX < COLS and 0 <= newY < ROWS and self.IfCollision(board, newY, newX):
                 obj = Piece(newY, newX, self.color)
-                board.boardOfBlue.append(obj)
+                board.possible_places_to_move.append(obj)
                 obj.drawBlueCircle(win)
     
     elif self.color == WHITE:
@@ -185,7 +185,7 @@ class Piece:
         for newX in [newX1, newX2]:
             if 0 <= newX < COLS and 0 <= newY < ROWS and self.IfCollision(board, newY, newX):
                 obj = Piece(newY, newX, self.color)
-                board.boardOfBlue.append(obj)
+                board.possible_places_to_move.append(obj)
                 obj.drawBlueCircle(win)
                 
     elif self.color == RED:
@@ -194,7 +194,7 @@ class Piece:
         for newX in [newX1, newX2]:
             if 0 <= newX < COLS and 0 <= newY < ROWS and self.IfCollision(board, newY, newX):
                 obj = Piece(newY, newX, self.color)
-                board.boardOfBlue.append(obj)
+                board.possible_places_to_move.append(obj)
                 obj.drawBlueCircle(win)
 
   def ifKing(self):
@@ -210,9 +210,9 @@ class Piece:
     if self.king == True and self not in board.king_piece: 
       board.king_piece.append(self) 
       if self.color == RED: 
-        board.red_kings += 1
+        board.number_of_kings_red += 1 
       else:
-        board.white_kings += 1
+        board.number_of_kings_white += 1
     for piece in board.king_piece:
         win.blit(CROWN, (piece.x - CROWN.get_width()//2, piece.y - CROWN.get_height()//2))
    
