@@ -1,7 +1,7 @@
 import pygame
 
-from constatnts import BLACK, ROWS, COLS, RED, SQUARE_SIZE, WHITE, GREEN
 from piece import Piece
+from constatnts import COLS, RED, BLACK, ROWS, GREEN, SQUARE_SIZE, WHITE
 import math as m
 
 class Board:
@@ -10,15 +10,17 @@ class Board:
     self.board = []
     self.boardOfBlue = []
     self.selected_piece = None  
-    self.red_left = self.white_left = 12
-    self.red_kings = self.white_kings = 0
+    self.red_count = 12
+    self.white_count = 12
+    self.number_of_kings_red = 0 
+    self.number_of_kings_white = 0
     self.turn = RED
     self.king_piece = [] 
     self.create_board()
    
-  # Min imax evaluation function
+  # Funckja oceny dla algorytmu minimax uwzgledniajaca liczbe pionkow i damki 
   def evaluate(self): 
-    return self.white_left - self.red_left  + (self.white_kings * 0.5 - self.red_kings * 0.5)
+    return self.white_count - self.red_count  + (self.number_of_kings_white * 0.5 - self.number_of_kings_red * 0.5)
    
   def remove(self, pieces, color):
     for piece in pieces:
@@ -28,7 +30,7 @@ class Board:
         else:
             self.white_left -= 1
 
-  def move(self, piece, row, col, win):
+  def move(self, piece, row, col):
     self.board[piece.row][piece.col], self.board[row][col] = 0, piece
     piece.row, piece.col = row, col 
     piece.center = (piece.row*SQUARE_SIZE + SQUARE_SIZE//2,piece.col * SQUARE_SIZE +SQUARE_SIZE//2) 
@@ -52,7 +54,7 @@ class Board:
                   piece.draw(WIN)
       
   
-  def winner(self):
+  def if_win_the_game(self):
     if self.red_left <= 0:
         return WHITE
     elif self.white_left <= 0:

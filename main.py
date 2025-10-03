@@ -2,7 +2,7 @@ import pygame
 from constatnts import WIDTH, HEIGHT, SQUARE_SIZE, WHITE, RED, BLACK, GREEN 
 from board import Board 
 from piece import Piece 
-from minimax import minimax
+from minimax import MinimaxAlgorithm
 
 FPS = 60
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -13,6 +13,7 @@ def main():
   run = True
   clock = pygame.time.Clock()
   board = Board()
+  minimax = MinimaxAlgorithm()
   board.draw(WIN)
   first_left_click = True
   obj = 0
@@ -42,10 +43,9 @@ def main():
             first_left_click = True
             board.change_turn()
             if board.turn == WHITE:
-                value, new_board, piece_ = minimax(board, 3, True, WIN, WIN)
+                value, new_board, piece_ = minimax.mini_max(3, board, True)
                 board = new_board
-                board.draw(WIN, piece_)  # <--- to zamiast manualnego recta
-                
+                board.draw(WIN, piece_)  # <--- to zamiast manualnego recta   
                 board.change_turn()
                 print("AI made a move")
     pygame.display.update()
